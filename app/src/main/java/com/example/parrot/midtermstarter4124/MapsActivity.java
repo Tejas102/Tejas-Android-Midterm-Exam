@@ -42,12 +42,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Used for Log.d statements
     // ---------------------------
-    final static String TAG = "PUT_YOUR_NAME_HERE!";
+    final static String TAG = "Tejas";
 
 
     // OKhttp client variables
     // --------------------
     OkHttpClient client = new OkHttpClient();
+
+    TextView tv;
 
     // Google Maps outlet
     // -------------------
@@ -79,6 +81,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        tv = (TextView) findViewById(R.id.textview1);
 
         //@TODO: Part 4 - Uncomment this code.
 
@@ -128,6 +132,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setupPermissions() {
         if (Build.VERSION.SDK_INT < 23) {
 
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             this.manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.userLocationListener);
 
         }
@@ -163,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
-        
+
         mMap = googleMap;
 
         // @TODO: PART 2 - Copy and paste this code into the JSON function.
@@ -179,7 +193,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void doJSONStuff(final GoogleMap mMap) {
 
         //@TODO: PART 2 - Change this URL
-        String URL = "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400";
+        String URL = "https://myawesomeproject-ded96.firebaseio.com/college.json";
         //String URL = "https://myawesomeproject-ded96.firebaseio.com/college.json";
         Request request = new Request.Builder()
                 .url(URL)
