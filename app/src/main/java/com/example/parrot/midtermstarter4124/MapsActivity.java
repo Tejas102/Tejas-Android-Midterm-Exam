@@ -81,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         //@TODO: Part 4 - Uncomment this code.
-        /*
+
         // 1. Setup the location manager variable
         this.manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -90,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // 3. Setup permissions
         setupPermissions();
-        */
+
     }
 
     public void setupLocationListener() {
@@ -161,7 +161,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         // @TODO: PART 1 - Write code to add zoom controls
 
-
+        UiSettings uiSettings = googleMap.getUiSettings();
+        uiSettings.setZoomControlsEnabled(true);
+        
         mMap = googleMap;
 
         // @TODO: PART 2 - Copy and paste this code into the JSON function.
