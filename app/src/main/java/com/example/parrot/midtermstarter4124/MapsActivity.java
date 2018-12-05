@@ -42,14 +42,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Used for Log.d statements
     // ---------------------------
-    final static String TAG = "Tejas";
+    final static String TAG = "PUT_YOUR_NAME_HERE!";
 
 
     // OKhttp client variables
     // --------------------
     OkHttpClient client = new OkHttpClient();
-
-    TextView tv;
 
     // Google Maps outlet
     // -------------------
@@ -82,8 +80,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        tv = (TextView) findViewById(R.id.textview1);
-
         //@TODO: Part 4 - Uncomment this code.
 
         // 1. Setup the location manager variable
@@ -104,9 +100,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onLocationChanged(Location location) {
                 // @TODO: Part 4 - Write the code to output the person's latitude and longitude to the screen
+                Log.d(TAG, "The user location changed!");
+                Log.d(TAG,"New location: " + location.toString());
 
                 // @TODO: Part 5 - Write the code to save the person's latitude and longitude to the variables
-
+                userLatitude = location.getLatitude();
+                userLongitude = location.getLongitude();
             }
 
             // IGNORE THIS FUNCTION!
@@ -132,16 +131,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setupPermissions() {
         if (Build.VERSION.SDK_INT < 23) {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             this.manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.userLocationListener);
 
         }
@@ -174,7 +163,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // @TODO: PART 1 - Write code to add zoom controls
-
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
 
@@ -193,8 +181,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void doJSONStuff(final GoogleMap mMap) {
 
         //@TODO: PART 2 - Change this URL
+        //String URL = "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400";
         String URL = "https://myawesomeproject-ded96.firebaseio.com/college.json";
-        //String URL = "https://myawesomeproject-ded96.firebaseio.com/college.json";
         Request request = new Request.Builder()
                 .url(URL)
                 .build();
@@ -226,7 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                     // @TODO: PART 2 - 1. Write the code to parse out the instructors array
-                    JSONArray instructorsArray = obj.getJSONArray("____________");
+                    JSONArray instructorsArray = obj.getJSONArray("instructors");
 
 
                     // @TODO: PART 2 - 2. Write the code to iterate through each item in the array.
@@ -243,13 +231,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // Get the name, latitude, and longitude of the instructor
                         // -------------
                         // @TODO: PART 2 - 3. Write code to parse out the instructor's name
-
+                        final String name = instructor.getString("name");
 
                         // @TODO: PART 2 - 4. Write name to parse out the latitude and longitude
+                        JSONObject location = instructor.getJSONObject("location");
+                        final double lat = location.getDouble("latitude");
+                        final double lng = location.getDouble("longitude");
 
                         // @TODO: PART 2 - 5. Write code to output the name, latitude, and longitude to the Terminal
+                        Log.d(TAG, "Name: " + name);
+                        Log.d(TAG, "Latitude: " + lat);
+                        Log.d(TAG, "Longitude: " + lng);
+                        Log.d(TAG, "--------");
 
                         // @TODO: PART 5 - Create a new Professor object & add it to the ArrayList
+                        Professor p = new Professor(name, lat, lng);
+                        professors.add(p);
 
                         // @TODO:  Show the Professor on the map
                         // output this status, sunrise and sunset time to the user interface
@@ -257,7 +254,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             @Override
                             public void run() {
                                 // @TODO: Put your map code in here
-
+                                Log.d(TAG, "Your map marker code should go here.");
+                                LatLng sydney = new LatLng(lat, lng);
+                                mMap.addMarker(new MarkerOptions().position(sydney).title(name));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 12));
 
                             }
                         });
@@ -275,9 +275,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // ACTIONS
-    // ------------
-
-    // This is the code that runs when the person presses the GET DISTANCES button.
+    // -------------
     public void getDistancesPressed(View view) {
         TextView t = (TextView) findViewById(R.id.textview1);
         t.setText("");
@@ -294,8 +292,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //double distance = getDistance(userLatitude,userLongitude, this.professors.get(i).getLat(), this.professors.get(i).getLng());
 
             //@TODO: Output the instructor NAME + DISTANCE to the textview.
-            String abc = "Your output goes here: " + String.format("%.2f", distance) + " km \n";
-            //String abc = this.professors.get(i).getName() + " is " + String.format("%.2f", distance) + " km away \n";
+            //String abc = "Your output goes here: " + String.format("%.2f", distance) + " km \n";
+            String abc = this.professors.get(i).getName() + " is " + String.format("%.2f", distance) + " km away \n";
             t.append(abc);
         }
     }
@@ -303,8 +301,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // PERMISSIONS POPUP
     // -------------
-
-    // This is a copy and paste of the template shown in class. You don't need to do anything with this function.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
